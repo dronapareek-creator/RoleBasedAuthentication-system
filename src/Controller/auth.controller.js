@@ -7,7 +7,8 @@ export async function registerUser(req, res) {
         const { username, email, password, role = "user" } = req.body;
 
         if (!username || !email || !password) {
-            return res.status(401).json({
+            return res.status(400).json({
+                success: false,
                 message: "All fields are required"
             })
         }
@@ -19,7 +20,8 @@ export async function registerUser(req, res) {
         });
 
         if (isUserAlreadyExists) {
-            return res.status(401).json({
+            return res.status(409).json({
+                success: false,
                 message: "User is already exists"
             })
         }
@@ -28,11 +30,16 @@ export async function registerUser(req, res) {
             username, email, password
         })
         return res.status(201).json({
+            success: true,
             message: "User is registered Successfully",
             newUser
         });
 
     } catch (error) {
-        console.error(error)
+        console.error("Register error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        })
     }
 }
