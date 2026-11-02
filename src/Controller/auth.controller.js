@@ -1,5 +1,7 @@
 import userModel from "../models/auth.model.js";
-import bcrypt from "bcrypt"
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
 
 export async function registerUser(req, res) {
     try {
@@ -32,7 +34,14 @@ export async function registerUser(req, res) {
             email,
             password: hashedPassword,
             role
-        })
+        });
+        const token = jwt.sign({
+            id: newUser._id,
+            role: newUser.role
+        }, process.env.JWT_SECRET_KEY)
+
+        res.cookie("token", token)
+
         return res.status(201).json({
             success: true,
             message: "User is registered Successfully",
@@ -43,6 +52,8 @@ export async function registerUser(req, res) {
                 role: newUser.role
             }
         });
+
+
 
     } catch (error) {
         console.error("Register error:", error);
